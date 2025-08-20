@@ -43,3 +43,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="Styles/Auth.css">
+</head>
+
+<body>
+    <?php
+    if (!empty($_SESSION['message'])) {
+        echo '<div class="message-box success" id="message-box">' . $_SESSION['message'] . '</div>';
+        unset($_SESSION['message']);
+    }
+
+    if (!empty($_SESSION['error'])) {
+        echo '<div class="message-box error" id="message-box">' . $_SESSION['error'] . '</div>';
+        unset($_SESSION['error']);
+    }
+    ?>
+
+    <div class="container" id="sign-in">
+        <h2>Sign In</h2>
+        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" name="sign_in" class="btn">Sign In</button>
+            <div class="link">
+                <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageBox = document.querySelector('.message-box');
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = '0';
+                    setTimeout(() => {
+                        messageBox.remove();
+                    }, 1000);
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+
+</html>
