@@ -1,0 +1,113 @@
+-- Customer Accounts Table
+CREATE TABLE Customers (
+    customer_id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20),
+    date_of_birth DATE,
+    gender ENUM('Male', 'Female', 'Other'),
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL
+);
+
+-- Staff and Admin Accounts Table
+CREATE TABLE StaffAccounts (
+    staff_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'staff') NOT NULL,
+    access_level ENUM('read', 'write', 'admin') NOT NULL,
+    
+);
+
+-- Membership Types Table
+CREATE TABLE MembershipTypes (
+    membership_id INT PRIMARY KEY AUTO_INCREMENT,
+    membership_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    monthly_fee DECIMAL(10,2) NOT NULL,
+    annual_fee DECIMAL(10,2) NOT NULL,
+    max_class_bookings INT,
+    personal_training_sessions INT,
+    nutrition_consultations INT,
+    status ENUM('Active', 'Inactive') DEFAULT 'Active'
+);
+
+-- Fitness Classes Table
+CREATE TABLE FitnessClasses (
+    class_id INT PRIMARY KEY AUTO_INCREMENT,
+    class_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    category ENUM('Personal Training','Yoga','Strength and Conditioning','Group Fitness','Nutrition Coaching'),
+    trainer_id INT,
+    class_image VARCHAR(255)
+    FOREIGN KEY (trainer_id) REFERENCES StaffAccounts(staff_id)
+);
+
+-- Class Schedules Table
+CREATE TABLE ClassSchedules (
+    schedule_id INT PRIMARY KEY AUTO_INCREMENT,
+    class_id INT NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    location VARCHAR(100),
+    available_slots INT,
+    FOREIGN KEY (class_id) REFERENCES FitnessClasses(class_id)
+);
+
+-- Class Bookings Table
+CREATE TABLE ClassBookings (
+    booking_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    schedule_id INT NOT NULL,
+    booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('Confirmed', 'Cancelled', 'Attended') DEFAULT 'Confirmed',
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (schedule_id) REFERENCES ClassSchedules(schedule_id)
+);
+
+-- Blog Posts Table
+CREATE TABLE BlogPosts (
+    post_id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id INT NOT NULL,
+    category ENUM('Workout','Yoga', 'Nutrition','Cardio', 'Fitness Tips'),
+    publication_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES StaffAccounts(staff_id)
+);
+
+-- Customer Inquiries Table
+CREATE TABLE CustomerInquiries (
+    inquiry_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('Open', 'In Progress', 'Resolved') DEFAULT 'Open',
+    assigned_staff_id INT,
+    resolution_date TIMESTAMP NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (assigned_staff_id) REFERENCES StaffAccounts(staff_id)
+);
+
+-- Payment Transactions Table
+CREATE TABLE PaymentTransactions (
+    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    payment_receipt VARCHAR(255) NOT NULL,
+    membership_id VARCHAR(255) NOT NULL,
+    status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (membership_id) REFERENCES Customers(membership_id)
+);
+
+-- Sample Data Insertion for Membership Types
+INSERT INTO MembershipTypes (membership_name, description, monthly_fee, annual_fee, max_class_bookings, personal_training_sessions, nutrition_consultations) VALUES 
+('Basic', 'Entry-level membership with basic access', 50.00, 500.00, 4, 0, 0),
+('Premium', 'Enhanced membership with more benefits', 80.00, 800.00, 8, 2, 1),
+('Elite', 'Top-tier membership with full access', 120.00, 1200.00, 12, 4, 2);
+
+
